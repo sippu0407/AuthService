@@ -73,5 +73,29 @@ class UserService{
 
     }
 
+    async isAuthenticated(token){
+
+        try {
+            const userDetails=this.verifyToken(token);
+
+            if(!userDetails){
+                throw {error:"invalid token"};
+            }
+
+            // if user has deactivated hi/her account
+            const user=await this.userRepository.getUser(userDetails.id);
+
+            if(!user){
+                throw {error:"no such user found"};
+            }
+
+            return userDetails.id;
+
+        } catch (error) {
+            console.log("error occurred in service layer");
+            return error;
+        }
+    }
+
 }
 module.exports=UserService;

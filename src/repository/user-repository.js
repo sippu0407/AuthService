@@ -24,7 +24,16 @@ class UserRepository{
 
            return user; 
         } catch (error) {
-            console.log("error occured in repository layer");
+            console.log("error occurred in repository layer");
+            throw error;
+        }
+    }
+    async getUser(userId){
+        try {
+            const user= await User.findByPk(userId);
+            return user;
+        } catch (error) {
+            console.log("error occurred in repository layer");
             throw error;
         }
     }
