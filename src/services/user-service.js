@@ -1,9 +1,45 @@
 const UserRepository=require('../repository/user-repository');
+const jwt = require('jsonwebtoken');
+const {JWT_KEY}=require('../config/serverConfig');
+const bcrypt=require('bcrypt');
 
 class UserService{
 
     constructor(){
      this.userRepository=new UserRepository();
+    }
+
+    createToken({email,id}){
+       try {
+        const token=jwt.sign({email,id},JWT_KEY,{expiresIn:30});
+        return token;
+         
+       } catch (error) {
+         console.log("unable to create token");
+         throw error;
+       }
+        
+    }
+
+    verifyToken(token){
+      
+        try {
+           const details=jwt.verify(token,JWT_KEY);  
+           return details;
+        } catch (error) {
+            console.log('error occured in verification of token');
+            throw error;
+        }
+    }
+
+    checkPassword(hashPwd,plainPwd){ 
+          try {
+              const matched = bcrypt.compareSync(hashPwd,plainPwd);
+              return matched;
+          } catch (error) {
+            console.log('password entered was wrong');
+            throw error;
+          }
     }
 
     async createUser(data){
@@ -14,6 +50,27 @@ class UserService{
             console.log('error occured in service layer');
             throw {error};
         }
+    }
+
+    async signIn({email,plainPassword}){
+
+     //  get user by email
+     const user=await this.userRepository.getUserByEmail(email);
+     // if user exists then
+     if(!user){
+        throw {error:"user does not exits"}
+     }
+     // compare pwd of user
+     const pwdMatch= this.checkPassword(user.password,plainPassword);
+     //if pwd matched
+     if(!pwdMatch){
+        throw {error:"email or password is wrong"};
+     }
+     //create a jwt-token
+     const jwtToken=this.createToken({email:email,id:user.id});
+     //return token
+     return jwtToken;
+
     }
 
 }
