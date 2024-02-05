@@ -28,7 +28,7 @@ const create=async(req,res)=>{
 
 const signIn=async(req,res)=>{
 try {
-    const response= await userService.signIn({email:req.body.email,plainPassword:req.body.password});
+    const response= await userService.signIn(req.body);
     return res.status(200).json({
         data:response,
         message:"successfully loggedIn",
@@ -50,7 +50,7 @@ try {
 const isAuthenticated=async (req,res)=>{
 
     try {
-        const response=await userService.isAuthenticated(req.header['x-access-token']);
+        const response=await userService.isAuthenticated(req.headers['x-access-token']);
         return res.status(200).json({
             data:response,
             message:"user is authenticated",

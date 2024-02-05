@@ -11,7 +11,7 @@ class UserService{
 
     createToken({email,id}){
        try {
-        const token=jwt.sign({email,id},JWT_KEY,{expiresIn:30});
+        const token=jwt.sign({email,id},JWT_KEY,{expiresIn:60});
         return token;
          
        } catch (error) {
@@ -34,7 +34,7 @@ class UserService{
 
     checkPassword(hashPwd,plainPwd){ 
           try {
-              const matched = bcrypt.compareSync(hashPwd,plainPwd);
+              const matched = bcrypt.compareSync(plainPwd,hashPwd);
               return matched;
           } catch (error) {
             console.log('password entered was wrong');
@@ -52,16 +52,21 @@ class UserService{
         }
     }
 
-    async signIn({email,plainPassword}){
+    async signIn({email,password}){
 
-     //  get user by email
+     try {
+
+         //  get user by email
      const user=await this.userRepository.getUserByEmail(email);
+
      // if user exists then
      if(!user){
         throw {error:"user does not exits"}
      }
      // compare pwd of user
-     const pwdMatch= this.checkPassword(user.password,plainPassword);
+     const pwdMatch= this.checkPassword(user.password,password);
+
+     console.log(pwdMatch);
      //if pwd matched
      if(!pwdMatch){
         throw {error:"email or password is wrong"};
@@ -70,6 +75,11 @@ class UserService{
      const jwtToken=this.createToken({email:email,id:user.id});
      //return token
      return jwtToken;
+        
+     } catch (error) {
+        console.log("error occured in service layer");
+        throw error;
+     }
 
     }
 
