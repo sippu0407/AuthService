@@ -11,10 +11,9 @@ const setupAndRunServer=()=>{
      app.use(bodyParser.urlencoded({extended:true}));
      
      app.use('/api',apiRouter);
-
-     db.sequelize.sync({alter:true});
-
-     app.listen(PORT,()=>{
+     
+     app.listen(PORT,async()=>{
+  
         console.log(`server is running on ${PORT}`);
      })
 }
