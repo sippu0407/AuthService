@@ -47,8 +47,8 @@ class UserService{
             const user=await this.userRepository.createUser(data);
             return user;
         } catch (error) {
-            console.log('error occured in service layer');
-            throw {error};
+            if(error.name=="SequelizeValidationError") throw error;
+            throw error;
         }
     }
 
@@ -112,7 +112,6 @@ class UserService{
         
           return await this.userRepository.isAdmin(userId);
          } catch (error) {
-             console.log("error occurred in repository layer");
              throw error;
          }
      }

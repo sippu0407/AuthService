@@ -16,10 +16,9 @@ const create=async(req,res)=>{
         error:{}
      });
    } catch (error) {
-    
+    if(error.name=="SequelizeValidationError") return error;
      return res.status(500).json({
-        data:{},
-        message:"user creation failed",
+        message:"not able to create a user",
         success:true,
         error:error
      });
